@@ -6,7 +6,7 @@
 /*   By: msaadidi <msaadidi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 01:47:56 by msaadidi          #+#    #+#             */
-/*   Updated: 2024/04/29 18:56:37 by msaadidi         ###   ########.fr       */
+/*   Updated: 2024/05/13 15:57:38 by msaadidi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 # include <stdlib.h>
 # include <unistd.h>
 # include <string.h>
+#include <sys/time.h>
 
 typedef struct s_philo
 {
@@ -30,11 +31,14 @@ typedef struct s_philo
     int             time_to_die;
     int             meals_eaten;
     int             meals_to_eat;
+    int             first_meal;
+    int             last_meal;
     int             dead;
     int             eating;
-    pthread_mutex_t *fork;
-    pthread_mutex_t *dead_lock;
-    pthread_mutex_t *meal_lock;
+    pthread_mutex_t fork;
+    pthread_mutex_t meal_lock;
+    pthread_mutex_t dead_lock;
 }   t_philo;
+
 
 #endif

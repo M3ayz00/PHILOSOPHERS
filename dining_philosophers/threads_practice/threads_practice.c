@@ -122,7 +122,6 @@ void    *consumer(void *param)
         pthread_mutex_lock(&products->mutex);
         consume(&products);
         pthread_mutex_unlock(&products->mutex);
-        printf("//////i just wanna know i = %d/////\n", i);
         usleep(40000);
     }
     return (NULL);
