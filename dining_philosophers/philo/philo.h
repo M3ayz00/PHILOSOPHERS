@@ -6,7 +6,7 @@
 /*   By: msaadidi <msaadidi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 01:47:56 by msaadidi          #+#    #+#             */
-/*   Updated: 2024/05/13 15:57:38 by msaadidi         ###   ########.fr       */
+/*   Updated: 2024/05/14 18:59:41 by msaadidi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,14 @@
 # define PHILO_H
 
 # define MAX_PHILO 200
+
+# define RED     "\x1b[31m"
+# define GREEN   "\x1b[32m"
+# define YELLOW  "\x1b[33m"
+# define BLUE    "\x1b[34m"
+# define MAGENTA "\x1b[35m"
+# define CYAN    "\x1b[36m"
+# define RESET   "\x1b[0m"
 # include <pthread.h>
 # include <stdio.h>
 # include <stdlib.h>
@@ -35,10 +43,22 @@ typedef struct s_philo
     int             last_meal;
     int             dead;
     int             eating;
-    pthread_mutex_t fork;
-    pthread_mutex_t meal_lock;
-    pthread_mutex_t dead_lock;
+    pthread_mutex_t *l_fork;
+    pthread_mutex_t *r_fork;
+    pthread_mutex_t *write_lock;
+    pthread_mutex_t *meal_lock;
+    pthread_mutex_t *dead_lock;
 }   t_philo;
+
+typedef struct s_data
+{
+    int             dead_flag;
+    t_philo         *philo;
+    pthread_mutex_t meal_lock;
+    pthread_mutex_t write_lock;
+    pthread_mutex_t dead_lock;
+    
+}   t_data;
 
 
 #endif

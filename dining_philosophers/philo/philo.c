@@ -6,7 +6,7 @@
 /*   By: msaadidi <msaadidi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 01:49:29 by msaadidi          #+#    #+#             */
-/*   Updated: 2024/05/13 15:56:39 by msaadidi         ###   ########.fr       */
+/*   Updated: 2024/05/14 19:07:17 by msaadidi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,109 +36,83 @@ int	ft_usleep(size_t milliseconds)
 	return (0);
 }
 
-int check_meals_eaten(t_philo *philo)
+int check_meals_eaten(t_philo philo)
 {
-	int i;
-	int counter;
-
-	i = -1;
-	counter = 0;
-	if (philo[0].meals_to_eat == -1)
+	if (philo.meals_to_eat == -1)
 		return (0);
-	while (++i < philo[0].nb_of_philo)
-	{
-		pthread_mutex_lock(&philo[i].meal_lock);
-		if (philo[i].meals_to_eat >= philo[i].meals_eaten)
-			counter++;
-		pthread_mutex_unlock(&philo[i].meal_lock);
-	}
-	if (counter == philo[0].nb_of_philo)
+	if (philo.meals_to_eat == philo.meals_eaten)
 		return (1);
-	else
-		return (0);
-}
-
-int check_dead_philo(t_philo *philo)
-{
-	int i;
-	int j;
-
-	i = -1;
-	while (++i < philo[0].nb_of_philo)
-	{
-		// printf("dead for %d : %d\n", i, philo[i].dead);
-		pthread_mutex_lock(&philo[i].dead_lock);
-		if (philo[i].dead)
-		{
-			j = -1;
-			while (++j < philo[0].nb_of_philo)
-				philo[j].dead = 1;
-			return (1);
-		}
-		pthread_mutex_unlock(&philo[i].dead_lock);
-	}
 	return (0);
 }
 
-void    sleeping(t_philo *philo)
+// int check_dead_philo(t_philo philo)
+// {
+// }
+
+void	print_msg(t_philo philo, char *act)
 {
-	printf("%ld %d is sleeping\n", get_time(), philo->id);
-	usleep(philo->time_to_sleep * 100);
+	pthread_mutex_lock(philo.write_lock);
+	printf("%d %s\n", philo.id, act);
+	pthread_mutex_unlock(philo.write_lock);
 }
 
-void    thinking(int id)
+void    sleeping(t_philo philo)
 {
-	printf("%ld %d is thinking.\n", get_time(), id);
+	print_msg(philo, BLUE "is sleeping." RESET);
+	ft_usleep(philo.time_to_sleep);
 }
 
-void    eating(t_philo *philo, int id)
+void    thinking(t_philo philo)
 {
-	pthread_mutex_lock(&philo[id].meal_lock);
-	philo[id].eating = 1;
-	pthread_mutex_lock(&philo[id].fork);
-	if (!philo[(id + 1) % philo[id].nb_of_philo].eating)
-	{
-		printf("%ld %d has taken a fork.\n",get_time(), id + 1);
-		pthread_mutex_lock(&philo[(id + 1)% philo[id].nb_of_philo].fork);
-		printf("%ld %d has taken a fork.\n", get_time(), id + 1);
-		printf("%ld %d is eating.\n", get_time(), id + 1);
-		usleep(philo[id].time_to_eat * 1000);
-		philo[id].meals_eaten++;
-		philo[id].eating = 0;
-		pthread_mutex_unlock(&philo[(id + 1)% philo[id].nb_of_philo].fork);
-		pthread_mutex_unlock(&philo[id].fork);
-	}
-	else
-	{
-		pthread_mutex_unlock(&philo[id].fork);
-		philo[id].eating = 0;
-	}
-	pthread_mutex_unlock(&philo[id].meal_lock);
-} 
+	print_msg(philo, GREEN "is thinking." RESET);
+}
+
+void    eating(t_philo philo)
+{
+	pthread_mutex_lock(philo.l_fork);
+	print_msg(philo, MAGENTA "has taken his left fork." RESET);
+	pthread_mutex_lock(philo.r_fork);
+	print_msg(philo, MAGENTA "has taken his right fork." RESET);
+	pthread_mutex_lock(philo.meal_lock);
+	philo.meals_eaten++;
+	pthread_mutex_unlock(philo.meal_lock);
+	print_msg(philo, CYAN "is eating." RESET);
+	ft_usleep(philo.time_to_eat);
+	pthread_mutex_unlock(philo.r_fork);
+	pthread_mutex_unlock(philo.l_fork);
+}
 
 void    *philo_routine(void *param)
 {
-	t_philo *philo;
-	int     id;
+	t_philo philo;
 
-	philo = ((t_philo *)param);
-	id = (*philo).id - 1;
-	while(!check_dead_philo(philo))
+	philo = (*((t_philo *)param));
+	if (philo.id % 2 == 0)
+		ft_usleep(5);
+	while(1)
 	{
-		eating(philo, id);
-		sleeping(&philo[id]);
-		thinking(id + 1);
+		eating(philo);
+		thinking(philo);
+		sleeping(philo);
 	}
 	return (NULL);
 }
 
 int    init_program(char **av)
 {
-	t_philo philo[MAX_PHILO];
+	t_data			data;
+	t_philo 		philo[MAX_PHILO];
+	pthread_mutex_t	fork[MAX_PHILO];
 
 	if (atoi(av[1]) > MAX_PHILO)
 		return (destroy_exit("Number of philosophers exceeded.\n"));
+	pthread_mutex_init(&data.dead_lock, NULL);
+	pthread_mutex_init(&data.write_lock, NULL);
+	pthread_mutex_init(&data.meal_lock, NULL);
 	int i = -1;
+	while (++i < atoi(av[1]))
+		pthread_mutex_init(&fork[i], NULL);
+	i = -1;
 	while (++i < atoi(av[1]))
 	{
 		philo[i].nb_of_philo = atoi(av[1]);
@@ -153,9 +127,16 @@ int    init_program(char **av)
 		philo[i].dead = 0;
 		philo[i].eating = 0;
 		philo[i].meals_eaten = 0;
-		pthread_mutex_init(&philo[i].fork, NULL);
-		pthread_mutex_init(&philo[i].dead_lock, NULL);
-		pthread_mutex_init(&philo[i].meal_lock, NULL);
+		philo[i].first_meal = get_time();
+		philo[i].last_meal = get_time();
+		philo[i].dead_lock = &data.dead_lock;
+		philo[i].meal_lock = &data.meal_lock;
+		philo[i].write_lock = &data.write_lock;
+		philo[i].l_fork = &fork[i];
+		if (i == 0)
+			philo[i].r_fork = &fork[philo[i].nb_of_philo - 1];
+		else
+			philo[i].r_fork = &fork[i - 1];
 	}
 	i = -1;
 	while (++i < philo[0].nb_of_philo)
