@@ -6,7 +6,7 @@
 /*   By: msaadidi <msaadidi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 01:47:56 by msaadidi          #+#    #+#             */
-/*   Updated: 2024/05/14 18:59:41 by msaadidi         ###   ########.fr       */
+/*   Updated: 2024/05/18 17:44:30 by msaadidi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,8 @@ typedef struct s_philo
     int             time_to_die;
     int             meals_eaten;
     int             meals_to_eat;
-    int             first_meal;
-    int             last_meal;
+    size_t          *start_time;
+    size_t          last_meal;
     int             dead;
     int             eating;
     pthread_mutex_t *l_fork;
@@ -52,7 +52,9 @@ typedef struct s_philo
 
 typedef struct s_data
 {
+    pthread_t       tid;
     int             dead_flag;
+    size_t          start_time;
     t_philo         *philo;
     pthread_mutex_t meal_lock;
     pthread_mutex_t write_lock;
