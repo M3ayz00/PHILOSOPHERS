@@ -6,7 +6,7 @@
 #    By: msaadidi <msaadidi@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/03/27 01:49:33 by msaadidi          #+#    #+#              #
-#    Updated: 2024/05/18 16:05:28 by msaadidi         ###   ########.fr        #
+#    Updated: 2024/05/20 15:45:17 by msaadidi         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -29,3 +29,7 @@ fclean : clean
 	@rm -f $(NAME)
 
 re : fclean all
+
+.PHONY : make re clean fclean
+
+.SECOND : $(OBJS)
