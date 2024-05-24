@@ -6,7 +6,7 @@
 /*   By: msaadidi <msaadidi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 01:49:29 by msaadidi          #+#    #+#             */
-/*   Updated: 2024/05/20 18:32:22 by msaadidi         ###   ########.fr       */
+/*   Updated: 2024/05/23 10:36:44 by msaadidi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,11 @@ int	check_philo_meals(t_philo *philos)
 			count++;
 	}
 	if (count == philos[0].nb_of_philo)
-		return (1);
+	{
+		pthread_mutex_lock(philos->dead_lock);
+		philos->dead = 1;
+		return (pthread_mutex_unlock(philos->dead_lock), 1);
+	}
 	return (0);
 }
 
@@ -76,7 +80,7 @@ int check_dead_philo(t_philo philo)
 void	print_msg(t_philo philo, char *act, char *color)
 {
 	pthread_mutex_lock(philo.write_lock);
-	printf("%s[%ld] %d %s\n", color, get_time() - *(philo.start_time), philo.id, act);
+	printf("%s[%ld] %d %s\n", color, get_time() - philo.start_time, philo.id, act);
 	pthread_mutex_unlock(philo.write_lock);
 }
 
@@ -87,9 +91,9 @@ int	check_all_states(t_philo *philo)
 	i = -1;
 	while (++i < philo[0].nb_of_philo)
 	{
-		if (philo[i].last_meal >= philo[i].time_to_die && philo[i].eating == 0)
+		printf("last_meal : %zu, time_to_die : %ld\n", get_time() - philo[i].last_meal, philo[i].time_to_die);
+		if (get_time() - philo[i].last_meal >= philo[i].time_to_die && philo[i].eating == 0)
 		{
-			printf("last_meal : %ld, time_to_die : %ld\n", philo[i].last_meal, philo[i].time_to_die);
 			print_msg(philo[i], "died."RESET, RED);
 			pthread_mutex_lock(philo[0].dead_lock);
 			philo[i].dead = 1;
@@ -131,11 +135,10 @@ void	pick_up_forks(t_philo philo)
 void    eat(t_philo philo)
 {
 	pick_up_forks(philo);
+	philo.eating = 1;
 	pthread_mutex_lock(philo.meal_lock);
 	philo.meals_eaten++;
-	philo.last_meal = (get_time() - *(philo.start_time)) - philo.last_meal;
-	printf("last_meal : %ld\n", philo.last_meal);
-	philo.eating = 1;
+	philo.last_meal = get_time();
 	pthread_mutex_unlock(philo.meal_lock);
 	print_msg(philo, "is eating."RESET, CYAN);
 	ft_usleep(philo.time_to_eat);
@@ -160,28 +163,26 @@ void    *philo_routine(void *param)
 
 void	*observer_routine(void *param)
 {
-	t_data	data;
+	t_observer	observer;
 
-	data = (*((t_data *)param));
-	while (1)
-		if (check_philo_meals(data.philo) || check_all_states(data.philo))
-			break;
+	observer = (*((t_observer *)param));
+	while (!check_philo_meals(observer.philo) || !check_all_states(observer.philo)){}
 	return (NULL);
 }
 
 
 int    init_program(char **av)
 {
-	t_data			data;
+	t_observer			observer;
 	t_philo 		philo[MAX_PHILO];
 	pthread_mutex_t	fork[MAX_PHILO];
 
 	if (atoi(av[1]) > MAX_PHILO)
 		return (destroy_exit("Number of philosophers exceeded.\n"));
-	pthread_mutex_init(&data.dead_lock, NULL);
-	pthread_mutex_init(&data.write_lock, NULL);
-	pthread_mutex_init(&data.meal_lock, NULL);
-	data.philo = philo;
+	pthread_mutex_init(&observer.dead_lock, NULL);
+	pthread_mutex_init(&observer.write_lock, NULL);
+	pthread_mutex_init(&observer.meal_lock, NULL);
+	observer.philo = philo;
 	int i = -1;
 	while (++i < atoi(av[1]))
 		pthread_mutex_init(&fork[i], NULL);
@@ -200,12 +201,11 @@ int    init_program(char **av)
 		philo[i].dead = 0;
 		philo[i].eating = 0;
 		philo[i].meals_eaten = 0;
-		data.start_time = get_time();
-		philo[i].start_time = &data.start_time;
-		philo[i].last_meal = 0;
-		philo[i].dead_lock = &data.dead_lock;
-		philo[i].meal_lock = &data.meal_lock;
-		philo[i].write_lock = &data.write_lock;
+		philo[i].start_time = get_time();
+		philo[i].last_meal = get_time();
+		philo[i].dead_lock = &observer.dead_lock;
+		philo[i].meal_lock = &observer.meal_lock;
+		philo[i].write_lock = &observer.write_lock;
 		philo[i].r_fork = &fork[i];
 		if (i == philo[i].nb_of_philo - 1)
 			philo[i].l_fork = &fork[0];
@@ -218,7 +218,7 @@ int    init_program(char **av)
 		if (pthread_create(&philo[i].tid, NULL, &philo_routine, (void *)&philo[i]))
 			return (destroy_exit("Thread creation error.\n"));
 	}
-	if (pthread_create(&data.tid, NULL, &observer_routine, (void *)&data))
+	if (pthread_create(&observer.tid, NULL, &observer_routine, (void *)&observer))
 		return (destroy_exit("Thread creation error.\n"));
 	i = -1;
 	while (++i < philo[0].nb_of_philo)
@@ -226,7 +226,7 @@ int    init_program(char **av)
 		if (pthread_join(philo[i].tid, NULL))
 			return (destroy_exit("Thread joining error.\n"));
 	}
-	if (pthread_join(data.tid, NULL))
+	if (pthread_join(observer.tid, NULL))
 			return (destroy_exit("Thread joining error.\n"));
 	return (0);
 }
