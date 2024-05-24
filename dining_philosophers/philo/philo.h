@@ -6,7 +6,7 @@
 /*   By: msaadidi <msaadidi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 01:47:56 by msaadidi          #+#    #+#             */
-/*   Updated: 2024/05/23 10:36:22 by msaadidi         ###   ########.fr       */
+/*   Updated: 2024/05/24 17:45:40 by msaadidi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,7 @@ typedef struct s_observer
 {
     pthread_t       tid;
     t_philo         *philo;
+    int             *dead_flag;
     pthread_mutex_t meal_lock;
     pthread_mutex_t write_lock;
     pthread_mutex_t dead_lock;
