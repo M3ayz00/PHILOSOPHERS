@@ -6,7 +6,7 @@
 /*   By: msaadidi <msaadidi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 01:47:56 by msaadidi          #+#    #+#             */
-/*   Updated: 2024/05/25 15:11:31 by msaadidi         ###   ########.fr       */
+/*   Updated: 2024/05/25 17:32:58 by msaadidi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,7 @@ typedef struct s_philo
     pthread_mutex_t *write_lock;
     pthread_mutex_t *meal_lock;
     pthread_mutex_t *dead_lock;
+    pthread_mutex_t *eat_lock;
 }   t_philo;
 
 typedef struct s_observer
@@ -59,6 +60,7 @@ typedef struct s_observer
     pthread_mutex_t meal_lock;
     pthread_mutex_t write_lock;
     pthread_mutex_t dead_lock;
+    pthread_mutex_t eat_lock;
     
 }   t_observer;
 

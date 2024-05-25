@@ -6,7 +6,7 @@
 /*   By: msaadidi <msaadidi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 01:49:29 by msaadidi          #+#    #+#             */
-/*   Updated: 2024/05/25 16:40:45 by msaadidi         ###   ########.fr       */
+/*   Updated: 2024/05/25 17:37:58 by msaadidi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ void	kill_philos_2(t_philo *philos)
 		pthread_detach(philos[i].tid);
 }
 
-int	check_philo_meals(t_philo *philos)
+int	check_philos_meals(t_philo *philos)
 {
 	int	i;
 	int	count;
@@ -99,7 +99,7 @@ void	print_msg(t_philo *philo, char *act, char *color)
 	pthread_mutex_unlock(philo->write_lock);
 }
 
-int	check_all_states(t_philo *philo)
+int	check_philos_state(t_philo *philo)
 {
 	int	i;
 
@@ -108,6 +108,7 @@ int	check_all_states(t_philo *philo)
 	{
 		if (philo[i].eating == 0 && get_time() - philo[i].last_meal >= philo[i].time_to_die)
 		{
+			// printf("eating ? %d last_meal : %ld\n", philo[i].eating, get_time() - philo[i].last_meal);
 			print_msg(&philo[i], "died."RESET, RED);
 			pthread_mutex_lock(philo[i].dead_lock);
 			*(philo[i].dead_flag) = 1;
@@ -150,6 +151,7 @@ void    eat(t_philo *philo)
 		return;
 	pick_up_forks(philo);
 	philo->eating = 1;
+	// printf("philo %d is eating : %d\n", philo->id, philo->eating);
 	print_msg(philo, "is eating."RESET, CYAN);
 	ft_usleep(philo->time_to_eat);
 	pthread_mutex_lock(philo->meal_lock);
@@ -181,7 +183,7 @@ void	*observer_routine(void *param)
 
 	observer = (*((t_observer *)param));
 	while (1)
-		if (check_all_states(observer.philo) == 0 && check_philo_meals(observer.philo) == 0)
+		if (check_philos_state(observer.philo) == 0 && check_philos_meals(observer.philo) == 0)
 			break;
 	// printf("OBSERVER GONE\n");
 	return (NULL);
