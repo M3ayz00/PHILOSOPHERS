@@ -6,7 +6,7 @@
 /*   By: msaadidi <msaadidi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 01:47:56 by msaadidi          #+#    #+#             */
-/*   Updated: 2024/05/27 15:52:34 by msaadidi         ###   ########.fr       */
+/*   Updated: 2024/05/31 17:34:40 by msaadidi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,7 @@ typedef struct s_philo
     int             eating;
     int             *dead_flag;
     int             *meals_flag;
+    int             *is_full;
     pthread_mutex_t *l_fork;
     pthread_mutex_t *r_fork;
     pthread_mutex_t *write_lock;
@@ -56,6 +57,7 @@ typedef struct s_observer
 {
     pthread_t       tid;
     t_philo         *philo;
+    int             *is_full;
     int             dead_flag;
     int             meals_flag;
     pthread_mutex_t meal_lock;
