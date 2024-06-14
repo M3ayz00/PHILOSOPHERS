@@ -6,7 +6,7 @@
 /*   By: msaadidi <msaadidi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 01:49:29 by msaadidi          #+#    #+#             */
-/*   Updated: 2024/06/11 19:09:00 by msaadidi         ###   ########.fr       */
+/*   Updated: 2024/06/14 16:08:58 by msaadidi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,10 +21,8 @@ void	*philo_routine(void *param)
 	{
 		if (!check_philos_state(&philo))
 			eat(&philo);
-		if (!check_philos_state(&philo))
-			sleeep(&philo);
-		if (!check_philos_state(&philo))
-			think(&philo);
+		think(&philo);
+		sleeep(&philo);
 	}
 	return (NULL);
 }
@@ -56,5 +54,6 @@ int	main(int ac, char **av)
 			print_error("time_to_eat time_to_sleep "),
 			print_error("[number_of_times_each_philosopher_must_eat]\n"));
 	if (init_program(av))
-		return (1);
+		return (system("leaks philo"), 1);
+	return (system("leaks philo"), 0);
 }

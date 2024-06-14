@@ -6,7 +6,7 @@
 /*   By: msaadidi <msaadidi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 01:47:56 by msaadidi          #+#    #+#             */
-/*   Updated: 2024/06/11 19:14:37 by msaadidi         ###   ########.fr       */
+/*   Updated: 2024/06/12 17:28:33 by msaadidi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,10 +52,8 @@ typedef struct s_philo
 	int				meals_to_eat;
 	size_t			start_time;
 	size_t			last_meal;
-	int				dead;
 	int				eating;
 	int				*dead_flag;
-	int				*meals_flag;
 	int				*is_full;
 	pthread_mutex_t	*l_fork;
 	pthread_mutex_t	*r_fork;
@@ -70,7 +68,6 @@ typedef struct s_observer
 	t_philo			*philo;
 	int				*is_full;
 	int				dead_flag;
-	int				meals_flag;
 	pthread_mutex_t	meal_lock;
 	pthread_mutex_t	write_lock;
 	pthread_mutex_t	dead_lock;
@@ -87,5 +84,9 @@ int		create_and_join(t_philo *philo, t_args *args);
 void	sleeep(t_philo *philo);
 void	think(t_philo *philo);
 void	eat(t_philo *philo);
-
+int		is_dead(t_philo *philo);
+int		check_philos_state(t_philo *philo);
+void	print_msg(t_philo *philo, char *act, char *color);
+int		ft_usleep(size_t milliseconds);
+void	meals_counter(t_philo *philo);
 #endif

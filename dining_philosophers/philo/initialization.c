@@ -6,7 +6,7 @@
 /*   By: msaadidi <msaadidi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 17:36:23 by msaadidi          #+#    #+#             */
-/*   Updated: 2024/06/11 19:11:47 by msaadidi         ###   ########.fr       */
+/*   Updated: 2024/06/14 16:14:41 by msaadidi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,9 @@
 
 static int	init_observer(t_observer *observer, t_philo *philo, int nb_of_philo)
 {
-	if (pthread_mutex_init(&observer->dead_lock, NULL))
-		return (print_error("Mutex initialization error.\n"));
-	if (pthread_mutex_init(&observer->write_lock, NULL))
-		return (print_error("Mutex initialization error.\n"));
-	if (pthread_mutex_init(&observer->meal_lock, NULL))
+	if (pthread_mutex_init(&observer->dead_lock, NULL)
+		|| pthread_mutex_init(&observer->write_lock, NULL)
+		|| pthread_mutex_init(&observer->meal_lock, NULL))
 		return (print_error("Mutex initialization error.\n"));
 	observer->philo = philo;
 	observer->dead_flag = 0;
@@ -35,7 +33,6 @@ static int	init_philo(t_philo *philo, t_args *args, t_observer *observer)
 	philo->time_to_die = args->time_to_die;
 	philo->time_to_eat = args->time_to_eat;
 	philo->time_to_sleep = args->time_to_sleep;
-	philo->dead = 0;
 	philo->eating = 0;
 	philo->meals_eaten = 0;
 	philo->start_time = get_time();

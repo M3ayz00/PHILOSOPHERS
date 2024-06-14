@@ -6,7 +6,7 @@
 /*   By: msaadidi <msaadidi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 19:00:53 by msaadidi          #+#    #+#             */
-/*   Updated: 2024/06/11 19:10:31 by msaadidi         ###   ########.fr       */
+/*   Updated: 2024/06/14 16:11:59 by msaadidi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,6 @@ void	sleeep(t_philo *philo)
 void	think(t_philo *philo)
 {
 	print_msg(philo, "is thinking" RESET, GREEN);
-	ft_usleep(10);
 }
 
 static void	pick_up_forks(t_philo *philo)
@@ -77,8 +76,8 @@ void	eat(t_philo *philo)
 		pthread_mutex_lock(philo->meal_lock);
 		philo->meals_eaten++;
 		philo->last_meal = get_time();
-		meals_counter(philo);
 		pthread_mutex_unlock(philo->meal_lock);
+		meals_counter(philo);
 		if (!is_dead(philo))
 			ft_usleep(philo->time_to_eat);
 		philo->eating = 0;
