@@ -6,7 +6,7 @@
 /*   By: msaadidi <msaadidi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 19:05:08 by msaadidi          #+#    #+#             */
-/*   Updated: 2024/06/14 16:13:14 by msaadidi         ###   ########.fr       */
+/*   Updated: 2024/07/18 17:36:35 by msaadidi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,9 @@
 
 int	is_dead(t_philo *philo)
 {
-	pthread_mutex_lock(philo->dead_lock);
 	if (*(philo->dead_flag) == 1)
-		return (pthread_mutex_unlock(philo->dead_lock), 1);
-	return (pthread_mutex_unlock(philo->dead_lock), 0);
+		return (1);
+	return (0);
 }
 
 void	meals_counter(t_philo *philo)

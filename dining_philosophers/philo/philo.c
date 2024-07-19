@@ -6,7 +6,7 @@
 /*   By: msaadidi <msaadidi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 01:49:29 by msaadidi          #+#    #+#             */
-/*   Updated: 2024/06/14 16:08:58 by msaadidi         ###   ########.fr       */
+/*   Updated: 2024/07/18 17:39:10 by msaadidi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,12 +17,14 @@ void	*philo_routine(void *param)
 	t_philo	philo;
 
 	philo = (*((t_philo *)param));
-	while (!is_dead(&philo))
+	while (!is_dead(&philo) && !check_philos_state(&philo))
 	{
-		if (!check_philos_state(&philo))
+		if (!is_dead(&philo) || !check_philos_state(&philo))
 			eat(&philo);
-		think(&philo);
-		sleeep(&philo);
+		if (!is_dead(&philo) || !check_philos_state(&philo))
+			think(&philo);
+		if (!is_dead(&philo) || !check_philos_state(&philo))
+			sleeep(&philo);
 	}
 	return (NULL);
 }
