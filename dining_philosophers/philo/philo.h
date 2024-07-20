@@ -6,7 +6,7 @@
 /*   By: msaadidi <msaadidi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 01:47:56 by msaadidi          #+#    #+#             */
-/*   Updated: 2024/06/12 17:28:33 by msaadidi         ###   ########.fr       */
+/*   Updated: 2024/07/20 16:43:35 by msaadidi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,4 +89,8 @@ int		check_philos_state(t_philo *philo);
 void	print_msg(t_philo *philo, char *act, char *color);
 int		ft_usleep(size_t milliseconds);
 void	meals_counter(t_philo *philo);
+int		lone_philo(t_philo *philo);
+int		pick_correct_fork(pthread_mutex_t *fork1,
+			pthread_mutex_t *fork2, t_philo *philo);
+
 #endif

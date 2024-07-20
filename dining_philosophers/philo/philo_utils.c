@@ -6,11 +6,18 @@
 /*   By: msaadidi <msaadidi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 19:03:38 by msaadidi          #+#    #+#             */
-/*   Updated: 2024/07/19 16:47:00 by msaadidi         ###   ########.fr       */
+/*   Updated: 2024/07/20 16:41:02 by msaadidi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
+
+int	is_dead(t_philo *philo)
+{
+	if (*(philo->dead_flag) == 1)
+		return (1);
+	return (0);
+}
 
 size_t	get_time(void)
 {

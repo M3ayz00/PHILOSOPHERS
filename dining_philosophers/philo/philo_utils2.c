@@ -6,18 +6,11 @@
 /*   By: msaadidi <msaadidi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 19:05:08 by msaadidi          #+#    #+#             */
-/*   Updated: 2024/07/18 17:36:35 by msaadidi         ###   ########.fr       */
+/*   Updated: 2024/07/20 16:42:55 by msaadidi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
-
-int	is_dead(t_philo *philo)
-{
-	if (*(philo->dead_flag) == 1)
-		return (1);
-	return (0);
-}
 
 void	meals_counter(t_philo *philo)
 {
@@ -56,4 +49,29 @@ int	check_philos_state(t_philo *philo)
 		return (pthread_mutex_unlock(philo->dead_lock), 1);
 	}
 	return (0);
+}
+
+int	lone_philo(t_philo *philo)
+{
+	print_msg(philo, "died" RESET, RED);
+	*(philo->dead_flag) = 1;
+	pthread_mutex_unlock(philo->r_fork);
+	return (EXIT_FAILURE);
+}
+
+int	pick_correct_fork(pthread_mutex_t *fork1,
+	pthread_mutex_t *fork2, t_philo *philo)
+{
+	pthread_mutex_lock(fork2);
+	print_msg(philo, "has taken a fork" RESET, MAGENTA);
+	if (philo->nb_of_philo == 1)
+		return (lone_philo(philo));
+	if (!check_philos_state(philo))
+	{
+		pthread_mutex_lock(fork1);
+		print_msg(philo, "has taken a fork" RESET, MAGENTA);
+		return (EXIT_SUCCESS);
+	}
+	pthread_mutex_unlock(fork2);
+	return (EXIT_FAILURE);
 }
