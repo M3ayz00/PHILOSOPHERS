@@ -6,7 +6,7 @@
 /*   By: msaadidi <msaadidi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 17:27:53 by msaadidi          #+#    #+#             */
-/*   Updated: 2024/07/23 17:27:56 by msaadidi         ###   ########.fr       */
+/*   Updated: 2024/07/23 20:26:45 by msaadidi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,10 +37,12 @@ static int	is_full(t_philo *philo)
 	return (0);
 }
 
+
 int	check_philos_state(t_philo *philo)
 {
+	
 	if (is_full(philo)
-		|| (philo->eating == 0
+		|| ((*philo->eating) == 0
 			&& get_time() - philo->last_meal >= philo->time_to_die))
 	{
 		print_msg(philo, "died" RESET, RED);

@@ -6,7 +6,7 @@
 /*   By: msaadidi <msaadidi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 01:47:56 by msaadidi          #+#    #+#             */
-/*   Updated: 2024/07/23 17:38:14 by msaadidi         ###   ########.fr       */
+/*   Updated: 2024/07/23 20:22:16 by msaadidi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,15 +45,15 @@ typedef struct s_philo
     pthread_t       tid;
     int             nb_of_philo;
     int             id;
-    size_t             time_to_eat;
-    size_t             time_to_sleep;
-    size_t             time_to_die;
+    size_t          time_to_eat;
+    size_t          time_to_sleep;
+    size_t          time_to_die;
     int             meals_eaten;
     int             meals_to_eat;
     size_t          start_time;
     size_t          last_meal;
     int             dead;
-    int             eating;
+    int             *eating;
     int				*is_full;
     int             *dead_flag;
     pthread_mutex_t *l_fork;
@@ -61,6 +61,7 @@ typedef struct s_philo
     pthread_mutex_t *write_lock;
     pthread_mutex_t *meal_lock;
     pthread_mutex_t *dead_lock;
+    pthread_mutex_t *eating_lock;
 }   t_philo;
 
 typedef struct s_observer
@@ -69,6 +70,7 @@ typedef struct s_observer
     t_philo         *philo;
     int             dead_flag;
     int				*is_full;
+    pthread_mutex_t eating_lock;
     pthread_mutex_t meal_lock;
     pthread_mutex_t write_lock;
     pthread_mutex_t dead_lock;
@@ -82,7 +84,7 @@ int		ft_atoi(char *str);
 int		init_program(char **av);
 int		*meals_arr(int nb_of_philo);
 size_t	get_time(void);
-int	create_and_join(t_philo *philo, t_args *args, t_observer observer);
+int	    create_and_join(t_philo *philo, t_args *args, t_observer *observer);
 void	sleeep(t_philo *philo);
 void	think(t_philo *philo);
 void	eat(t_philo *philo);

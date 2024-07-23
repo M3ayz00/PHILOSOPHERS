@@ -6,7 +6,7 @@
 /*   By: msaadidi <msaadidi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 17:22:54 by msaadidi          #+#    #+#             */
-/*   Updated: 2024/07/23 18:22:00 by msaadidi         ###   ########.fr       */
+/*   Updated: 2024/07/23 20:23:16 by msaadidi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,9 +22,10 @@ static int	init_observer(t_observer *observer, t_philo *philo, int nb_of_philo)
 {
 	if (pthread_mutex_init(&observer->dead_lock, NULL)
 		|| pthread_mutex_init(&observer->write_lock, NULL)
-		|| pthread_mutex_init(&observer->meal_lock, NULL))
+		|| pthread_mutex_init(&observer->meal_lock, NULL)
+		|| pthread_mutex_init(&observer->eating_lock, NULL))
 		return (print_error("Mutex initialization error.\n"));
-	observer->philo = &philo;
+	observer->philo = (t_philo *)philo;
 	observer->dead_flag = 0;
 	observer->is_full = meals_arr(nb_of_philo);
 	if (!observer->is_full)
@@ -35,11 +36,14 @@ static int	init_observer(t_observer *observer, t_philo *philo, int nb_of_philo)
 
 static int	init_philo(t_philo *philo, t_args *args, t_observer *observer)
 {
+	int	temp;
+
+	temp = 0;
 	philo->nb_of_philo = args->nb_of_philo;
 	philo->time_to_die = args->time_to_die;
 	philo->time_to_eat = args->time_to_eat;
 	philo->time_to_sleep = args->time_to_sleep;
-	philo->eating = 0;
+	philo->eating = &temp;
 	philo->meals_eaten = 0;
 	philo->start_time = get_time();
 	philo->last_meal = get_time();
@@ -50,6 +54,7 @@ static int	init_philo(t_philo *philo, t_args *args, t_observer *observer)
 	philo->dead_lock = &observer->dead_lock;
 	philo->meal_lock = &observer->meal_lock;
 	philo->write_lock = &observer->write_lock;
+	philo->eating_lock = &observer->eating_lock;
 	return (0);
 }
 
@@ -89,7 +94,8 @@ static int	init_philos(t_philo *philo, t_args *args,
 	}
 	return (0);
 }
-int	create_and_join(t_philo *philo, t_args *args, t_observer observer)
+
+int	create_and_join(t_philo *philo, t_args *args, t_observer *observer)
 {
 	int	i;
 
@@ -99,7 +105,7 @@ int	create_and_join(t_philo *philo, t_args *args, t_observer observer)
 		if (pthread_create(&philo[i].tid, NULL, &philo_routine, &philo[i]))
 			return (print_error("Thread creation error.\n"));
 	}
-	if (pthread_create(&observer.tid, NULL, &observer_routine, &observer))
+	if (pthread_create(&observer->tid, NULL, &observer_routine, observer))
 		return (destroy_exit("Thread creation error.\n"));
 	i = -1;
 	while (++i < args->nb_of_philo)
@@ -107,7 +113,7 @@ int	create_and_join(t_philo *philo, t_args *args, t_observer observer)
 		if (pthread_join(philo[i].tid, NULL))
 			return (print_error("Thread joining error.\n"));
 	}
-	if (pthread_join(observer.tid, NULL))
+	if (pthread_join(observer->tid, NULL))
 		return (destroy_exit("Thread joining error.\n"));
 	return (0);
 }
@@ -130,7 +136,7 @@ int	init_program(char **av)
 		return (free(args), 1);
 	if (init_philos(philo, args, &observer, fork))
 		return (free(args), 1);
-	if (create_and_join(philo, args, observer))
+	if (create_and_join(philo, args, &observer))
 		return (free(args), 1);
 	return (0);
 }
