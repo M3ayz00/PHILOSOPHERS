@@ -6,7 +6,7 @@
 /*   By: msaadidi <msaadidi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 01:47:56 by msaadidi          #+#    #+#             */
-/*   Updated: 2024/07/23 20:22:16 by msaadidi         ###   ########.fr       */
+/*   Updated: 2024/07/24 17:11:04 by msaadidi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,11 +49,14 @@ typedef struct s_philo
     size_t          time_to_sleep;
     size_t          time_to_die;
     int             meals_eaten;
+    int             *meals_eaten_p;
     int             meals_to_eat;
     size_t          start_time;
     size_t          last_meal;
+    size_t          *last_meal_p;
     int             dead;
-    int             *eating;
+    int             eating;
+    int             *eating_p;
     int				*is_full;
     int             *dead_flag;
     pthread_mutex_t *l_fork;

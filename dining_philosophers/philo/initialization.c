@@ -6,7 +6,7 @@
 /*   By: msaadidi <msaadidi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 17:22:54 by msaadidi          #+#    #+#             */
-/*   Updated: 2024/07/23 20:23:16 by msaadidi         ###   ########.fr       */
+/*   Updated: 2024/07/24 17:32:07 by msaadidi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,17 +36,17 @@ static int	init_observer(t_observer *observer, t_philo *philo, int nb_of_philo)
 
 static int	init_philo(t_philo *philo, t_args *args, t_observer *observer)
 {
-	int	temp;
-
-	temp = 0;
 	philo->nb_of_philo = args->nb_of_philo;
 	philo->time_to_die = args->time_to_die;
 	philo->time_to_eat = args->time_to_eat;
 	philo->time_to_sleep = args->time_to_sleep;
-	philo->eating = &temp;
+	philo->eating = 0;
+	philo->eating_p = &philo->eating;
 	philo->meals_eaten = 0;
+	philo->meals_eaten_p = &philo->meals_eaten;
 	philo->start_time = get_time();
 	philo->last_meal = get_time();
+	philo->last_meal_p = &philo->last_meal;
 	if (philo->start_time == 0 || philo->last_meal == 0)
 		return (print_error("Error : gettimeofday().\n"));
 	philo->is_full = observer->is_full;
@@ -58,15 +58,29 @@ static int	init_philo(t_philo *philo, t_args *args, t_observer *observer)
 	return (0);
 }
 
-static int	init_forks(pthread_mutex_t *fork, int nb_of_philo)
+void	free_destroy(pthread_mutex_t *fork, int nb_of_philo)
 {
 	int	i;
 
 	i = -1;
 	while (++i < nb_of_philo)
+		pthread_mutex_destroy(&fork[i]);
+	free(fork);
+}
+
+static int	init_forks(pthread_mutex_t *fork, int nb_of_philo)
+{
+	int	i;
+
+	i = -1;
+	fork = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t) * nb_of_philo);
+	if (!fork)
+		return (print_error("Mutex allocation error.\n"));
+	while (++i < nb_of_philo)
 	{
 		if (pthread_mutex_init(&fork[i], NULL))
-			return (print_error("Mutex initializationn error.\n"));
+			return (free_destroy(fork, nb_of_philo),
+				print_error("Mutex initializationn error.\n"));
 	}
 	return (0);
 }

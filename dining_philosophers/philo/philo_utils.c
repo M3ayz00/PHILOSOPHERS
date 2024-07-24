@@ -6,7 +6,7 @@
 /*   By: msaadidi <msaadidi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 17:27:33 by msaadidi          #+#    #+#             */
-/*   Updated: 2024/07/23 18:14:58 by msaadidi         ###   ########.fr       */
+/*   Updated: 2024/07/24 16:19:55 by msaadidi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,14 +41,13 @@ int	ft_usleep(size_t milliseconds)
 
 void	print_msg(t_philo *philo, char *act, char *color)
 {
+	if (is_dead(philo))
+		return ;
+	pthread_mutex_lock(philo->write_lock);
 	if (!is_dead(philo))
-	{
-		pthread_mutex_lock(philo->write_lock);
-		if (!is_dead(philo))
-			printf("%s%ld %d %s\n", color, get_time() - philo->start_time,
-				philo->id, act);
-		pthread_mutex_unlock(philo->write_lock);
-	}
+		printf("%s%ld %d %s\n", color, get_time() - philo->start_time,
+			philo->id, act);
+	pthread_mutex_unlock(philo->write_lock);
 }
 
 int	*meals_arr(int nb_of_philo)
