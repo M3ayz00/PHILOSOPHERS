@@ -6,7 +6,7 @@
 /*   By: msaadidi <msaadidi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 17:26:56 by msaadidi          #+#    #+#             */
-/*   Updated: 2024/07/23 17:26:58 by msaadidi         ###   ########.fr       */
+/*   Updated: 2024/07/25 21:07:19 by msaadidi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,16 +30,13 @@ int	print_error(char *err)
 
 static int	treat_first_args(t_args *args, char **av)
 {
-	if (args->nb_of_philo > MAX_PHILO)
-		return (print_error("Number of philosophers exceeded.\n"),
-			free(args), 1);
+	args->nb_of_philo = ft_atoi(av[1]);
 	args->time_to_die = ft_atoi(av[2]);
 	args->time_to_eat = ft_atoi(av[3]);
 	args->time_to_sleep = ft_atoi(av[4]);
-	if (args->nb_of_philo < 0 || args->time_to_die < 60
-		|| args->time_to_eat < 60 || args->time_to_sleep < 60)
-		return (print_error("Only positive numbers are allowed.\n \
-			Minimum is 60 (N >= 60).\nExcept for nb_of_philo (N > 0).\n"),
+	if (args->nb_of_philo < 0 || args->time_to_die < 0
+		|| args->time_to_eat < 0 || args->time_to_sleep < 0)
+		return (print_error("Only positive numbers are allowed (N > 0).\n"),
 			free(args), 1);
 	return (0);
 }

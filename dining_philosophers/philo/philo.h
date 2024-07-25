@@ -6,7 +6,7 @@
 /*   By: msaadidi <msaadidi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 01:47:56 by msaadidi          #+#    #+#             */
-/*   Updated: 2024/07/24 17:11:04 by msaadidi         ###   ########.fr       */
+/*   Updated: 2024/07/25 21:57:53 by msaadidi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,10 +54,8 @@ typedef struct s_philo
     size_t          start_time;
     size_t          last_meal;
     size_t          *last_meal_p;
-    int             dead;
     int             eating;
     int             *eating_p;
-    int				*is_full;
     int             *dead_flag;
     pthread_mutex_t *l_fork;
     pthread_mutex_t *r_fork;
@@ -70,13 +68,12 @@ typedef struct s_philo
 typedef struct s_observer
 {
     pthread_t       tid;
-    t_philo         *philo;
+    t_philo         **philo;
     int             dead_flag;
-    int				*is_full;
-    pthread_mutex_t eating_lock;
     pthread_mutex_t meal_lock;
     pthread_mutex_t write_lock;
     pthread_mutex_t dead_lock;
+    pthread_mutex_t eating_lock;
     
 }   t_observer;
 
@@ -85,18 +82,15 @@ t_args	*parse_args(char **av);
 int		print_error(char *err);
 int		ft_atoi(char *str);
 int		init_program(char **av);
-int		*meals_arr(int nb_of_philo);
 size_t	get_time(void);
-int	    create_and_join(t_philo *philo, t_args *args, t_observer *observer);
+int	    create_and_join(t_args *args, t_observer **observer);
 void	sleeep(t_philo *philo);
 void	think(t_philo *philo);
 void	eat(t_philo *philo);
 int		is_dead(t_philo *philo);
-int		check_philos_state(t_philo *philo);
 void	print_msg(t_philo *philo, char *act, char *color);
 int		ft_usleep(size_t milliseconds);
-void	meals_counter(t_philo *philo);
-int		lone_philo(t_philo *philo);
+int     lone_philo(t_philo *philo, pthread_mutex_t *fork);
 void    *philo_routine(void *param);
 void	*observer_routine(void *param);
 int		pick_correct_fork(pthread_mutex_t *fork1,

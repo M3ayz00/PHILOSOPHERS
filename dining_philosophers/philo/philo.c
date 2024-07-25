@@ -6,22 +6,15 @@
 /*   By: msaadidi <msaadidi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 01:49:29 by msaadidi          #+#    #+#             */
-/*   Updated: 2024/07/24 17:26:28 by msaadidi         ###   ########.fr       */
+/*   Updated: 2024/07/25 22:02:15 by msaadidi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-int	is_eating(t_philo *philo)
-{
-	pthread_mutex_lock(philo->eating_lock);
-	if ((*philo->eating_p) == 1)
-		return (pthread_mutex_unlock(philo->eating_lock), 1);
-	return (pthread_mutex_unlock(philo->eating_lock), 0);
-}
-
 int	is_time(t_philo *philo)
 {
+	// printf("last meal : %zu\n", philo->last_meal);
 	pthread_mutex_lock(philo->meal_lock);
 	if (get_time() - (*philo->last_meal_p) >= philo->time_to_die)
 		return (pthread_mutex_unlock(philo->meal_lock), 1);
@@ -34,7 +27,7 @@ int check_meals_eaten(t_observer *observer)
 	t_philo	*philo;
 	int	counter;
 
-	philo = observer->philo;
+	philo = *(observer->philo);
 	counter = 0;
 	i = -1;
 	if (philo[0].meals_to_eat == -1)
@@ -51,16 +44,25 @@ int check_meals_eaten(t_observer *observer)
 	return (0);
 }
 
+int	is_eating(t_philo *philo)
+{
+	pthread_mutex_lock(philo->eating_lock);
+	if (*philo->eating_p)
+		return (pthread_mutex_unlock(philo->eating_lock), 1);
+	return (pthread_mutex_unlock(philo->eating_lock), 0);
+}
+
 int	check_all_states(t_observer *observer)
 {
 	int	i;
 	t_philo	*philo;
 
-	philo = observer->philo;
+	philo = *(observer->philo);
 	i = -1;
 	while (++i < philo[0].nb_of_philo)
 	{
-		if ((!is_eating(&philo[i]) && is_time(&philo[i])) || check_meals_eaten(observer))
+		// printf("philo %d ate last time at %zu\n", philo[i].id, get_time() - philo[i].last_meal);
+		if (is_dead(&philo[i]) || (!is_eating(&philo[i]) && is_time(&philo[i])) || check_meals_eaten(observer))
 		{
 			print_msg(&philo[i], "died."RESET, RED);
 			pthread_mutex_lock(philo[i].dead_lock);
@@ -71,35 +73,13 @@ int	check_all_states(t_observer *observer)
 	return (1);
 }
 
-
-
-int	kill_philos(t_philo *philos, int count)
-{
-	int i = -1;
-	if (count == philos[0].nb_of_philo)
-	{
-		while (++i < philos[0].nb_of_philo)
-			pthread_detach(philos[i].tid);
-		return (1);
-	}
-	return (0);
-}
-
-void	kill_philos_2(t_philo *philos)
-{
-	int i = -1;
-	while (++i < philos[0].nb_of_philo)
-		pthread_detach(philos[i].tid);
-}
-
-
-
-
 void	sleeep(t_philo *philo)
 {
-	print_msg(philo, "is sleeping" RESET, BLUE);
 	if (!is_dead(philo))
+	{
+		print_msg(philo, "is sleeping" RESET, BLUE);
 		ft_usleep(philo->time_to_sleep);
+	}
 }
 
 void	think(t_philo *philo)
@@ -176,12 +156,12 @@ void    *philo_routine(void *param)
 
 void	*observer_routine(void *param)
 {
-	t_observer	observer;
+	t_observer	*observer;
 
-	observer = (*((t_observer *)param));
+	observer = (*((t_observer **)param));
 	while (1)
 	{
-		if (!check_all_states(&observer))
+		if (!check_all_states(observer))
 			break;
 	}
 	return (NULL);
