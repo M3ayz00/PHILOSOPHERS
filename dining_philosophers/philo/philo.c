@@ -6,7 +6,7 @@
 /*   By: msaadidi <msaadidi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 01:49:29 by msaadidi          #+#    #+#             */
-/*   Updated: 2024/07/26 22:40:34 by msaadidi         ###   ########.fr       */
+/*   Updated: 2024/07/27 00:53:19 by msaadidi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ int check_meals_eaten(t_observer *observer)
 	counter = 0;
 	i = -1;
 	if (philo[0].meals_to_eat == -1)
-		return (0);
+		return (1);
 	while (++i < philo[0].nb_of_philo)
 	{
 		pthread_mutex_lock(philo->meal_lock);
@@ -40,8 +40,13 @@ int check_meals_eaten(t_observer *observer)
 		pthread_mutex_unlock(philo->meal_lock);
 	}
 	if (counter == philo[0].nb_of_philo)
-		return (1);
-	return (0);
+	{
+		pthread_mutex_lock(philo->dead_lock);
+		(*philo->dead_flag) = 1;
+		pthread_mutex_unlock(philo->dead_lock);
+		return (0);
+	}
+	return (1);
 }
 
 int	is_eating(t_philo *philo)
@@ -66,8 +71,7 @@ int	check_all_states(t_observer *observer)
 	i = -1;
 	while (++i < philo[0].nb_of_philo)
 	{
-		// printf("philo %d ate last time at %zu\n", philo[i].id, get_time() - philo[i].last_meal);
-		if (is_dead(&philo[i]) || is_starving(&philo[i]) || check_meals_eaten(observer))
+		if (is_starving(&philo[i]))
 		{
 			print_msg(&philo[i], "died."RESET, RED);
 			pthread_mutex_lock(philo[i].dead_lock);
@@ -80,19 +84,17 @@ int	check_all_states(t_observer *observer)
 
 void	sleeep(t_philo *philo)
 {
+	print_msg(philo, "is sleeping" RESET, BLUE);
 	if (!is_dead(philo))
-	{
-		print_msg(philo, "is sleeping" RESET, BLUE);
 		ft_usleep(philo->time_to_sleep);
-	}
 }
 
 void	think(t_philo *philo)
 {
 	if (!is_dead(philo))
 		print_msg(philo, "is thinking" RESET, GREEN);
-	if (philo->nb_of_philo % 2 != 0 && philo->time_to_eat + philo->time_to_sleep < philo->time_to_die)
-		usleep(2000);
+	if (philo->time_to_eat + philo->time_to_sleep < philo->time_to_die && philo->nb_of_philo > 2)
+		ft_usleep(5);
 }
 
 static int	pick_up_forks(t_philo *philo)
@@ -108,10 +110,11 @@ static int	pick_up_forks(t_philo *philo)
 
 static void	put_down_forks(t_philo *philo)
 {
+	// printf("philo %d opla\n", philo->id);
 	if (philo->id % 2 != 0)
 	{
-		pthread_mutex_unlock(philo->r_fork);
 		pthread_mutex_unlock(philo->l_fork);
+		pthread_mutex_unlock(philo->r_fork);
 	}
 	else
 	{
@@ -149,8 +152,10 @@ void    *philo_routine(void *param)
 	t_philo philo;
 
 	philo = (*((t_philo *)param));
-	while(!is_dead(&philo))
+	while(1)
 	{
+		if (is_dead(&philo))
+			break;
 		eat(&philo);
 		sleeep(&philo);
 		think(&philo);
@@ -165,7 +170,7 @@ void	*observer_routine(void *param)
 	observer = (*((t_observer **)param));
 	while (1)
 	{
-		if (!check_all_states(observer))
+		if (!check_all_states(observer) || !check_meals_eaten(observer))
 			break;
 	}
 	return (NULL);
@@ -173,8 +178,11 @@ void	*observer_routine(void *param)
 
 void	free_all(t_data *data)
 {
-	free_destroy(data->fork, data->philo->nb_of_philo);
+	int	n_ph;
+
+	n_ph = data->philo->nb_of_philo;
 	free(data->philo);
+	free_destroy(data->fork, n_ph);
 	free(data->observer);
 	free(data->args);
 }

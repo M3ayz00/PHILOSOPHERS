@@ -6,7 +6,7 @@
 /*   By: msaadidi <msaadidi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 17:27:53 by msaadidi          #+#    #+#             */
-/*   Updated: 2024/07/25 22:01:33 by msaadidi         ###   ########.fr       */
+/*   Updated: 2024/07/27 00:53:02 by msaadidi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 int	lone_philo(t_philo *philo, pthread_mutex_t *fork)
 {
+	ft_usleep(philo->time_to_die);
 	print_msg(philo, "died" RESET, RED);
 	pthread_mutex_lock(philo->dead_lock);
 	*(philo->dead_flag) = 1;
@@ -35,6 +36,7 @@ int	pick_correct_fork(pthread_mutex_t *fork1,
 		print_msg(philo, "has taken a fork" RESET, MAGENTA);
 		return (EXIT_SUCCESS);
 	}
+	printf("philo %d opla\n", philo->id);
 	pthread_mutex_unlock(fork2);
 	return (EXIT_FAILURE);
 }

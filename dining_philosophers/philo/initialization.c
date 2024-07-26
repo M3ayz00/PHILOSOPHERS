@@ -6,7 +6,7 @@
 /*   By: msaadidi <msaadidi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 17:22:54 by msaadidi          #+#    #+#             */
-/*   Updated: 2024/07/26 22:43:19 by msaadidi         ###   ########.fr       */
+/*   Updated: 2024/07/27 00:03:11 by msaadidi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,7 +129,6 @@ int	create_and_join(t_args *args, t_observer **observer)
 	{
 		if (pthread_join(philo[i].tid, NULL))
 			return (print_error("Thread joining error.\n"));
-		usleep(200);
 	}
 	if (pthread_join((*observer)->tid, NULL))
 		return (destroy_exit("Thread joining error.\n"));
