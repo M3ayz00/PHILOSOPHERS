@@ -6,7 +6,7 @@
 /*   By: msaadidi <msaadidi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 01:49:29 by msaadidi          #+#    #+#             */
-/*   Updated: 2024/07/25 22:02:15 by msaadidi         ###   ########.fr       */
+/*   Updated: 2024/07/26 22:40:34 by msaadidi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ int check_meals_eaten(t_observer *observer)
 	while (++i < philo[0].nb_of_philo)
 	{
 		pthread_mutex_lock(philo->meal_lock);
-		if ((*philo->meals_eaten_p) >= philo->meals_to_eat)
+		if ((*philo[i].meals_eaten_p) >= philo[i].meals_to_eat)
 			counter++;
 		pthread_mutex_unlock(philo->meal_lock);
 	}
@@ -52,6 +52,11 @@ int	is_eating(t_philo *philo)
 	return (pthread_mutex_unlock(philo->eating_lock), 0);
 }
 
+int	is_starving(t_philo *philo)
+{
+	return (!is_eating(philo) && is_time(philo));
+}
+
 int	check_all_states(t_observer *observer)
 {
 	int	i;
@@ -62,7 +67,7 @@ int	check_all_states(t_observer *observer)
 	while (++i < philo[0].nb_of_philo)
 	{
 		// printf("philo %d ate last time at %zu\n", philo[i].id, get_time() - philo[i].last_meal);
-		if (is_dead(&philo[i]) || (!is_eating(&philo[i]) && is_time(&philo[i])) || check_meals_eaten(observer))
+		if (is_dead(&philo[i]) || is_starving(&philo[i]) || check_meals_eaten(observer))
 		{
 			print_msg(&philo[i], "died."RESET, RED);
 			pthread_mutex_lock(philo[i].dead_lock);
@@ -86,9 +91,8 @@ void	think(t_philo *philo)
 {
 	if (!is_dead(philo))
 		print_msg(philo, "is thinking" RESET, GREEN);
-	if (philo->time_to_eat + philo->time_to_sleep < philo->time_to_die
-		&& !is_dead(philo))
-		ft_usleep(5);
+	if (philo->nb_of_philo % 2 != 0 && philo->time_to_eat + philo->time_to_sleep < philo->time_to_die)
+		usleep(2000);
 }
 
 static int	pick_up_forks(t_philo *philo)
@@ -167,10 +171,22 @@ void	*observer_routine(void *param)
 	return (NULL);
 }
 
+void	free_all(t_data *data)
+{
+	free_destroy(data->fork, data->philo->nb_of_philo);
+	free(data->philo);
+	free(data->observer);
+	free(data->args);
+}
+
 int main(int ac, char **av)
 {
+	t_data	data;
+
+	data = (t_data){0};
 	if (ac < 5 || ac > 6)
 		return (1);
-	if (init_program(av))
+	if (init_program(av, &data))
 		return (1);
+	free_all(&data);
 }

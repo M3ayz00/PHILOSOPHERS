@@ -6,7 +6,7 @@
 /*   By: msaadidi <msaadidi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 01:47:56 by msaadidi          #+#    #+#             */
-/*   Updated: 2024/07/25 21:57:53 by msaadidi         ###   ########.fr       */
+/*   Updated: 2024/07/26 22:11:37 by msaadidi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,11 +77,21 @@ typedef struct s_observer
     
 }   t_observer;
 
+typedef struct s_data
+{
+    t_philo         *philo;
+    t_observer      *observer;
+    t_args          *args;
+    pthread_mutex_t *fork;
+}   t_data;
+
+
 int	    destroy_exit(char *err);
 t_args	*parse_args(char **av);
 int		print_error(char *err);
 int		ft_atoi(char *str);
-int		init_program(char **av);
+int		init_program(char **av, t_data *data);
+void	free_destroy(pthread_mutex_t *fork, int nb_of_philo);
 size_t	get_time(void);
 int	    create_and_join(t_args *args, t_observer **observer);
 void	sleeep(t_philo *philo);

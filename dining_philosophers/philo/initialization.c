@@ -6,7 +6,7 @@
 /*   By: msaadidi <msaadidi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 17:22:54 by msaadidi          #+#    #+#             */
-/*   Updated: 2024/07/25 22:00:17 by msaadidi         ###   ########.fr       */
+/*   Updated: 2024/07/26 22:43:19 by msaadidi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,13 +129,14 @@ int	create_and_join(t_args *args, t_observer **observer)
 	{
 		if (pthread_join(philo[i].tid, NULL))
 			return (print_error("Thread joining error.\n"));
+		usleep(200);
 	}
 	if (pthread_join((*observer)->tid, NULL))
 		return (destroy_exit("Thread joining error.\n"));
 	return (0);
 }
 
-int	init_program(char **av)
+int	init_program(char **av, t_data *data)
 {
 	t_args			*args;
 	t_observer		*observer;
@@ -148,8 +149,6 @@ int	init_program(char **av)
 	args = parse_args(av);
 	if (!args)
 		return (1);
-	if (args->nb_of_philo > MAX_PHILO)
-		return (free(args), print_error("Number of philosophers exceeded.\n"));
 	observer = init_observer();
 	if (!observer)
 		return (free(args), 1);
@@ -164,5 +163,9 @@ int	init_program(char **av)
 	if (create_and_join(args, &observer))
 		return (free(args),  free(philo), free(observer),
 			free_destroy(fork, args->nb_of_philo), 1);
+	data->args = args;
+	data->fork = fork;
+	data->observer = observer;
+	data->philo = philo;
 	return (0);
 }
