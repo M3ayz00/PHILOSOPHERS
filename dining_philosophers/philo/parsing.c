@@ -5,13 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: msaadidi <msaadidi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-<<<<<<< HEAD
-/*   Created: 2024/06/06 16:51:44 by msaadidi          #+#    #+#             */
-/*   Updated: 2024/07/20 16:28:56 by msaadidi         ###   ########.fr       */
-=======
 /*   Created: 2024/07/23 17:26:56 by msaadidi          #+#    #+#             */
-/*   Updated: 2024/07/27 18:15:47 by msaadidi         ###   ########.fr       */
->>>>>>> real_checkpoint
+/*   Updated: 2024/07/27 18:42:17 by msaadidi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,18 +30,6 @@ int	print_error(char *err)
 
 static int	treat_first_args(t_args *args, char **av)
 {
-<<<<<<< HEAD
-	if (args->nb_of_philo > MAX_PHILO)
-		return (print_error("Number of philosophers exceeded.\n"),
-			free(args), 1);
-	args->time_to_die = ft_atoi(av[2]);
-	args->time_to_eat = ft_atoi(av[3]);
-	args->time_to_sleep = ft_atoi(av[4]);
-	if (args->nb_of_philo < 0 || args->time_to_die < 60
-		|| args->time_to_eat < 60 || args->time_to_sleep < 60)
-		return (print_error("Only positive numbers are allowed.\n \
-			Minimum is 60 (N >= 60).\nExcept for nb_of_philo (N > 0).\n"),
-=======
 	args->nb_of_philo = ft_atoi(av[1]);
 	args->time_to_die = ft_atoi(av[2]);
 	args->time_to_eat = ft_atoi(av[3]);
@@ -54,7 +37,6 @@ static int	treat_first_args(t_args *args, char **av)
 	if (args->nb_of_philo < 0 || args->time_to_die < 0
 		|| args->time_to_eat < 0 || args->time_to_sleep < 0)
 		return (print_error("Only positive integers are allowed : (N > 0).\n"),
->>>>>>> real_checkpoint
 			free(args), 1);
 	return (0);
 }
@@ -74,12 +56,8 @@ t_args	*parse_args(char **av)
 		args->av = av[5];
 		args->meals_to_eat = ft_atoi(av[5]);
 		if (args->meals_to_eat <= 0)
-<<<<<<< HEAD
-			return (print_error("Only positive numbers are allowed (N > 0).\n"),
-=======
 			return (\
 			print_error("Only positive integers are allowed : (N > 0).\n"),
->>>>>>> real_checkpoint
 				free(args), NULL);
 	}
 	else
