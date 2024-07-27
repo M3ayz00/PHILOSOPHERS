@@ -6,18 +6,26 @@
 /*   By: msaadidi <msaadidi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 17:27:33 by msaadidi          #+#    #+#             */
-/*   Updated: 2024/07/27 00:52:54 by msaadidi         ###   ########.fr       */
+/*   Updated: 2024/07/27 18:17:42 by msaadidi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
+void	kill_philo(t_philo *philo)
+{
+	print_msg(philo, "died."RESET, RED);
+	pthread_mutex_lock(philo->dead_lock);
+	(*philo->dead_flag) = 1;
+	pthread_mutex_unlock(philo->dead_lock);
+}
+
 int	is_dead(t_philo *philo)
 {
-    pthread_mutex_lock(philo->dead_lock);
-    if (*(philo->dead_flag) == 1)
-        return (pthread_mutex_unlock(philo->dead_lock), 1);
-    return (pthread_mutex_unlock(philo->dead_lock), 0);
+	pthread_mutex_lock(philo->dead_lock);
+	if (*(philo->dead_flag) == 1)
+		return (pthread_mutex_unlock(philo->dead_lock), 1);
+	return (pthread_mutex_unlock(philo->dead_lock), 0);
 }
 
 size_t	get_time(void)

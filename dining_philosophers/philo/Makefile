@@ -6,14 +6,14 @@
 #    By: msaadidi <msaadidi@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/03/27 01:49:33 by msaadidi          #+#    #+#              #
-#    Updated: 2024/07/27 00:20:26 by msaadidi         ###   ########.fr        #
+#    Updated: 2024/07/27 18:25:56 by msaadidi         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = philo
-SRCS =  philo.c atoi.c parsing.c initialization.c  philo_utils.c philo_utils2.c
+SRCS =  philo.c atoi.c parsing.c initialization.c  philo_utils.c philo_utils2.c checkers.c philo_actions.c
 OBJS = $(SRCS:.c=.o)
-CFLAGS = -Wall -Wextra -Werror -fsanitize=thread
+CFLAGS = -Wall -Wextra -Werror #-fsanitize=thread
 CC = cc
 
 all : $(NAME)
